@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TripAura – Indore Weekend Trip Planner</title>
+<style>
+  :root {
+    --primary: #c0392b;
+    --primary-light: #f5d3ce;
+    --primary-dark: #8b251a;
+    --bg: #faf3ee;
+    --card: #ffffff;
+    --text: #3a2a1f;
+    --muted: #8a6f5c;
+    --accent: #f1c40f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+  .section { padding: 80px 0; }
+  .section h2 { font-size: 2rem; text-align: center; margin-bottom: 40px; color: var(--primary-dark); }
+
+  /* Hero */
+  .hero {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(135deg, #e8a87c, #f3d9b8, #ffe8d0);
+    padding: 40px 20px;
+  }
+  .hero h1 { font-size: 3.5rem; margin-bottom: 16px; color: var(--primary-dark); }
+  .hero p { font-size: 1.3rem; color: #5a3f2c; margin-bottom: 32px; max-width: 600px; }
+  .cta {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 18px 48px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(192,57,43,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .cta:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(192,57,43,0.4); }
+  @media (max-width: 480px) { .hero h1 { font-size: 2.2rem; } }
+
+  /* Features */
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+  .feature-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    border: 1px solid #e0c9b4;
+    transition: transform 0.2s;
+  }
+  .feature-card:hover { transform: translateY(-6px); }
+  .feature-card h3 { color: var(--primary-dark); font-size: 1.3rem; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .feature-card .icon { font-size: 2.5rem; }
+  .feature-card p { color: var(--muted); font-size: 1rem; }
+
+  /* Planner */
+  .planner {
+    max-width: 700px;
+    margin: 0 auto;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    border: 1px solid #e0c9b4;
+  }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 1rem; font-weight: 600; margin-bottom: 8px; color: var(--primary-dark); }
+  select, .budget-chips { width: 100%; padding: 12px; font-size: 1rem; border-radius: 10px; border: 1px solid #d4b896; background: #fff; }
+  .budget-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .budget-chip {
+    flex: 1; min-width: 120px; text-align: center; padding: 12px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; background: #f8efe2; color: var(--muted);
+  }
+  .budget-chip.active { background: var(--accent); color: var(--text); border-color: var(--accent); font-weight: 700; }
+  .plan-btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 16px 32px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+  }
+  .plan-btn:hover { background: var(--primary-dark); }
+  .plan-output { margin-top: 24px; display: none; }
+  .plan-output h3 { color: var(--primary-dark); margin-bottom: 16px; }
+  .plan-output ul { list-style: none; margin-bottom: 16px; }
+  .plan-output li { padding: 6px 0; }
+  .plan-output .cost { color: var(--primary); font-weight: 700; font-size: 1.1rem; margin-top: 16px; }
+  .plan-output .food { color: #8a6f5c; font-style: italic; }
+  @media (max-width: 480px) { .section { padding: 50px 0; } .section h2 { font-size: 1.5rem; } }
+
+  /* FAQ */
+  .faq { max-width: 600px; margin: 0 auto; }
+  .faq-item {
+    background: var(--card);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .faq-question {
+    width: 100%;
+    padding: 18px 20px;
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .faq-question .toggle { font-size: 1.5rem; transition: transform 0.2s; }
+  .faq-item.open .toggle { transform: rotate(45deg); }
+  .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s; }
+  .faq-answer p { padding: 0 20px 18px; color: var(--muted); }
+
+  /* Footer */
+  footer {
+    background: var(--primary-dark);
+    color: #f5d3ce;
+    text-align: center;
+    padding: 40px 20px;
+    margin-top: 40px;
+  }
+  footer a { color: #f1c40f; margin: 0 10px; text-decoration: none; }
+  footer .copyright { font-size: 0.9rem; margin-top: 16px; color: #d8b898; }
+
+  @media (max-width: 390px) {
+    .hero h1 { font-size: 1.8rem; }
+    .hero p { font-size: 1.1rem; }
+    .section h2 { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>✈️ TripAura</h1>
+      <p>Your instant weekend getaway planner from Indore. Discover curated local trips, budget-friendly plans, and unforgettable memories.</p>
+      <button class="cta" onclick="document.getElementById('planner').scrollIntoView({behavior:'smooth'})">Plan My Weekend</button>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section">
+    <div class="container">
+      <h2>🌟 Why TripAura?</h2>
+      <div class="features">
+        <div class="feature-card">
+          <h3>🗺️ Curated Local Trips</h3>
+          <p>Hand-picked weekend destinations near Indore, vetted for quality and charm.</p>
+        </div>
+        <div class="feature-card">
+          <h3>💰 Budget-Friendly Plans</h3>
+          <p>Options for every wallet – from a low-cost day out to a luxurious escape.</p>
+        </div>
+        <div class="feature-card">
+          <h3>⚡ Instant Itineraries</h3>
+          <p>Get a complete Saturday and Sunday plan in seconds, tailored just for you.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trip Planner -->
+  <section id="planner" class="section">
+    <div class="container">
+      <h2>🗓️ Mini Trip Planner</h2>
+      <div class="planner">
+        <div class="form-group">
+          <label for="city">Choose a City</label>
+          <select id="city">
+            <option value="indore">Indore</option>
+            <option value="bhopal">Bhopal</option>
+            <option value="ujjain">Ujjain</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Choose Your Budget</label>
+          <div class="budget-chips" id="budgetChips">
+            <button class="budget-chip active" data-budget="low">Low</button>
+            <button class="budget-chip" data-budget="medium">Medium</button>
+            <button class="budget-chip" data-budget="high">High</button>
+          </div>
+        </div>
+        <button class="plan-btn" onclick="planWeekend()">Plan My Weekend</button>
+        <div class="plan-output" id="planOutput"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section">
+    <div class="container">
+      <h2>❓ Frequently Asked Questions</h2>
+      <div class="faq">
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">Is TripAura free to use?<span class="toggle">▼</span></button>
+          <div class="faq-answer"><p>Yes! TripAura is completely free. Our weekend plans are created using publicly available information and local insights.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">Can I plan for a city other than Indore?<span class="toggle">▼</span></button>
+          <div class="faq-answer"><p>Currently, TripAura focuses on Indore and nearby cities like Bhopal and Ujjain, but we're expanding soon!</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">How accurate are the suggested itineraries?<span class="toggle">▼</span></button>
+          <div class="faq-answer"><p>Our plans are based on popular local attractions and typical visit times, but we recommend double-checking opening hours before you go.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">Do I need to book anything in advance?<span class="toggle">▼</span></button>
+          <div class="faq-answer"><p>Most suggested activities don't require advance booking, but for popular restaurants and tours, booking ahead is always a good idea.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <h3>TripAura ✨</h3>
+      <p>Weekend Trip Planner from Indore, India</p>
+      <p>
+        <a href="#planner">Planner</a> |
+        <a href="#features">Features</a> |
+        <a href="#faq">FAQ</a>
+      </p>
+      <p class="copyright">© 2025 TripAura. All rights reserved.</p>
+    </div>
+  </footer>
+
+<script>
+  // Budget selection
+  const budgetChips = document.getElementById('budgetChips');
+  budgetChips.querySelectorAll('.budget-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      budgetChips.querySelectorAll('.budget-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  // Trip planner data
+  const plans = {
+    indore: {
+      low: {
+        saturday: "Morning: Visit Lal Bagh Palace & Sarafa Bazaar for local snacks. Afternoon: Explore Khajuri Bazaar for handicrafts. Evening: Dinner at a local dhaba.",
+        sunday: "Morning:Visit Pithampur industrial tour (free). Afternoon: Relax at Lal Bagh. Evening: Street food crawl at Mangala Bazaar.",
+        places: ["Lal Bagh Palace", "Khajuri Bazaar", "Sarafa Bazaar", "Pithampur Industrial Tour"],
+        food: ["Poha-Jalebi", "Samosa", "Chikki", "Locally made lassi"],
+        cost: "₹800-₹1,200"
+      },
+      medium: {
+        saturday: "Morning: Visit Lal Bagh Palace & Rabindra Bhavan. Afternoon: Explore Central Market & Jhalawar Bazaar. Evening: Dinner at a nice restaurant.",
+        sunday: "Morning: Day trip to Pithampur industries. Afternoon: Visit Kanak Vrindavan Temple. Evening: Relax at a cafe.",
+        places: ["Lal Bagh Palace", "Rabindra Bhavan", "Central Market", "Kanak Vrindavan Temple"],
+        food: ["Street food platter", "Traditional thali", "Café brunch", "Cold drinks"],
+        cost: "₹2,000-₹3,500"
+      },
+      high: {
+        saturday: "Morning: Luxury breakfast & visit Lal Bagh Palace with guided tour. Afternoon: Shopping at Indira Mall & Jhalawar Bazaar. Evening: Fine dining.",
+        sunday: "Day trip to nearby wildlife sanctuary or spa day. Afternoon: Luxury café hopping. Evening: Farewell dinner.",
+        places: ["Lal Bagh Palace (guided)", "Indira Mall", "Wildlife Sanctuary", "Luxury Spa"],
+        food: ["Gourmet breakfast", "Fine dining dinner", "Artisan coffee", "Gourmet desserts"],
+        cost: "₹8,000-₹12,000"
+      }
+    },
+    bhopal: {
+      low: {
+        saturday: "Morning: Visit Upper Lake & Shaukat Mahal. Afternoon: Explore Old Bhopal markets. Evening: Local street food.",
+        sunday: "Morning: Visit Sanchi Stupa. Afternoon: Return & relax at a park. Evening: Simple dinner.",
+        places: ["Upper Lake", "Shaukat Mahal", "Old Bhopal Markets", "Sanchi Stupa"],
+        food: ["Bhopal poha", "Chowki", "Local snacks", "Simple thali"],
+        cost: "₹1,000-₹1,500"
+      },
+      medium: {
+        saturday: "Morning: Upper Lake & Shaukat Mahal. Afternoon: Tribal Museum & Lokpriya Gopalkrishna Gandhi Memorial. Evening: Restaurant dinner.",
+        sunday: "Morning: Sanchi Stupa visit. Afternoon: Explore New Market & Indira Gandhi Memorial. Evening: Cafe visit.",
+        places: ["Upper Lake", "Shaukat Mahal", "Tribal Museum", "Sanchi Stupa", "New Market"],
+        food: ["Traditional meal", "Cafe brunch", "Local specialties", "Coffee"],
+        cost: "₹2,500-₹4,000"
+      },
+      high: {
+        saturday: "Luxury breakfast & private boat ride on Upper Lake. Afternoon: Visit State Museum & high-end shopping. Evening: Fine dining.",
+        sunday: "Private tour of Sanchi Stupa & nearby caves. Afternoon: Spa & luxury café. Evening: Farewell dinner.",
+        places: ["Upper Lake (private)", "State Museum", "Sanchi Stupa (private)", "Luxury Spa"],
+        food: ["Gourmet breakfast", "Fine dining", "Premium local cuisine", "Desserts"],
+        cost: "₹10,000-₹15,000"
+      }
+    },
+    ujjain: {
+      low: {
+        saturday: "Morning: Visit Mahakaleshwar Temple & Kal Bhairava Temple. Afternoon: Explore local markets. Evening: Simple dinner.",
+        sunday: "Morning: Visit Ram Janmabhoomi & Ashram. Afternoon: Relax & local snacks. Evening: Return journey.",
+        places: ["Mahakaleshwar Temple", "Kal Bhairava Temple", "Ram Janmabhoomi", "Local Markets"],
+        food: ["Ujjaini poha", "Local sweets", "Simple thali", "Chai"],
+        cost: "₹700-₹1,000"
+      },
+      medium: {
+        saturday: "Morning: Mahakaleshwar Temple & Kal Bhairava Temple. Afternoon: Explore Ashram & local shopping. Evening: Nice restaurant dinner.",
+        sunday: "Morning: Ram Janmabhoomi & Kal Bhairava. Afternoon: Cultural experience & café. Evening: Return.",
+        places: ["Mahakaleshwar Temple", "Ram Janmabhoomi", "Ashram", "Local Shopping"],
+        food: ["Traditional Ujjaini meal", "Local sweets", "Café brunch", "Chai"],
+        cost: "₹1,500-₹2,500"
+      },
+      high: {
+        saturday: "Luxury breakfast & guided temple tour. Afternoon: Premium shopping & spa. Evening: Fine dining.",
+        sunday: "Private guided visit to all major temples. Afternoon: Luxury lunch & relaxation. Evening: Return.",
+        places: ["Mahakaleshwar Temple (guided)", "Ram Janmabhoomi (guided)", "Premium Spa", "Luxury Shopping"],
+        food: ["Gourmet breakfast", "Traditional thali", "Fine dining", "Premium sweets"],
+        cost: "₹7,000-₹10,000"
+      }
+    }
+  };
+
+  function getPlan(city, budget) {
+    return plans[city][budget];
+  }
+
+  function planWeekend() {
+    const city = document.getElementById('city').value;
+    const budget = document.querySelector('.budget-chip.active').dataset.budget;
+    const plan = getPlan(city, budget);
+
+    const output = document.getElementById('planOutput');
+    output.innerHTML = `
+      <h3>🌆 ${city.charAt(0).toUpperCase() + city.slice(1)} Weekend Plan (${budget.charAt(0).toUpperCase() + budget.slice(1)} Budget)</h3>
+      <h4>📍 Places to Visit:</h4>
+      <ul>
+        ${plan.places.map(p => `<li>${p}</li>`).join('')}
+      </ul>
+      <h4>🍽️ Food to Try:</h4>
+      <ul class="food">
+        ${plan.food.map(f => `<li>${f}</li>`).join('')}
+      </ul>
+      <h4>💰 Estimated Cost:</h4>
+      <p class="cost">${plan.cost}</p>
+      <h4>📅 Saturday:</h4>
+      <p>${plan.saturday}</p>
+      <h4>📅 Sunday:</h4>
+      <p>${plan.sunday}</p>
+    `;
+    output.style.display = 'block';
+  }
+
+  // FAQ accordion
+  function toggleFAQ(button) {
+    const item = button.parentElement;
+    const answer = item.querySelector('.faq-answer');
+    item.classList.toggle('open');
+    answer.style.maxHeight = answer.classList.contains('open') ? '500px' : '0';
+    button.querySelector('.toggle').textContent = item.classList.contains('open') ? '▲' : '▼';
+  }
+
+  // Set initial active budget
+  budgetChips.querySelector('.budget-chip.active').click();
+</script>
+
+</body>
+</html>
